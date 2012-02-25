@@ -27,27 +27,30 @@ $ ->
   
   # states
   getName = (name) ->
-    onInput = ->
-    console.log 'setting name to ' + name
-    socket.emit 'set name', name
-    post 'type to talk.'
-    onInput = chat
-    socket.on 'chat msg', (msgobj) ->
-      post msgobj.sender + ' says "' + msgobj.msg + '"'
+    post 'wait for name to be set...'
+    socket.emit 'set name', name, ->
+      console.log 'name set to ' + name
+      post 'you are ' + name + '.'
+      post 'type to talk.'
+      socket.on 'chat msg', (msgobj) ->
+        console.log 'received message object', msgobj
+        post msgobj.sender + ' says "' + msgobj.msg + '"'
+      # socket.on 'chat msg', ->
+      onInput = chat
   
   chat = (msg) ->
     socket.emit 'chat msg', {msg: msg}
   
-  # Transport
+  # transport
   post 'awaiting socket...'
   
   socket = io.connect()
   
   socket.on 'connect', ->
-    post 'socket connected'
-    console.log socket
-    post 'enter name.'
+    post 'socket connected.'
+    post 'enter name:'
     onInput = getName
   
   socket.on 'disconnect', ->
-    post 'socket disconnected'
+    post 'socket disconnected.'
+    onInput = ->

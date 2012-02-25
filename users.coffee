@@ -10,17 +10,20 @@ usersExcept = (user) -> _U.without users, user
 module.exports = (app) ->
   app.users =
     join: (user) ->
-      if (_U.detect users, (u) -> u.uniq is user.uniq)?
-        throw 'cannot register user who is already in users'
+      if (_U.detect users, (u) -> u is user)?
+        throw 'cannot register user who is already in users (' + user.name + ')'
       users.push user
-      console.log 'added user named ' + user.name
+      console.log 'joined user named ' + user.name
       console.log 'user count: ' + users.length
       user
     
     leave: (user) ->
-      u.send user.name + ' has left.' for u in (users = usersExcept user)
+      console.log user.name + ' has left.'
+      u.send {msg: user.name + ' has left.'} for u in (users = usersExcept user)
       console.log 'user count: ' + users.length
     
     recvMsg: (user, msg) ->
-      console.log 'received message, resending to ' + (usersExcept user).length
-      u.send {sender: user.name, msg: msg} for u in usersExcept user
+      console.log 'received message from ' + user.name +
+                  ', resending to ' + (usersExcept user).length
+      msg.sender = user.name
+      u.send msg for u in usersExcept user

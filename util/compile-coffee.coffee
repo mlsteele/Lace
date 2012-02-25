@@ -1,14 +1,5 @@
-###
-module.exports = (src, dest) ->
-  console.log 'compile-coffee: starting: from', src, '->', dest
-  (require 'child_process').exec 'coffee -co '+dest+' '+src, (error, stdout, stderr) ->
-    console.log 'compile-coffee: EXIT: from', src, '->', dest
-    console.log 'compile-coffee: error:', error
-    console.log 'compile-coffee: stdout:', stdout
-    console.log 'compile-coffee: stderr:', stderr
-###
+# Compiles all .coffee files from src into .js file in dest
 
-util  = require('util')
 child_process = require('child_process')
 
 module.exports = (src, dest) ->
