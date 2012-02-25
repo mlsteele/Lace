@@ -25,6 +25,7 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+app.API_PREFIX = '/api/0.1'
 require('./users')(app);
 require('./routes/main')(app);
 

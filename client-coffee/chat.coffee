@@ -2,7 +2,7 @@ console.log 'hi! chat.coffee has loaded.'
 
 $ ->
   console.log 'chat.coffee is running under jquery after the dom'
-  API_PREFIX = '/api01'
+  API_PREFIX = '/api/0.1'
   
   # DOM Setup
   $output = $ '.chat-log'
