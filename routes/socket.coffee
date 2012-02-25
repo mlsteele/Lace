@@ -4,13 +4,15 @@ module.exports = (app) ->
   
   io.sockets.on 'connection', (socket) ->
     console.log 'socket connected'
-    socket.on 'set name', (name, cb) ->
-      console.log socket
-      user = app.users.join
+    socket.on 'set name', (name, beUser) ->
+      console.log 'socket name set to', name
+      user =
         name: name,
         uniq: socket.id,
         sendMsg: (msg) -> socket.emit 'chat msg', msg
         sendList: (list) -> socket.emit 'chat list', list
+      beUser user
+      app.users.join user
       
       console.log 'user created from socket named ' + user.name
       
@@ -21,5 +23,3 @@ module.exports = (app) ->
       socket.on 'disconnect', ->
         console.log 'socket disconnected of user named ' + user.name
         app.users.leave user
-      
-      cb? user
