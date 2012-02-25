@@ -7,9 +7,7 @@ console.log 'hi! chat.coffee has loaded.'
 
 $ ->
   console.log 'chat.coffee is running under jquery after the dom'
-  
   client = {}
-  
   
   # DOM Setup
   $output = $ '.chat-log'
