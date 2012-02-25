@@ -14,7 +14,6 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-  
 });
 
 app.configure('development', function(){
@@ -28,6 +27,7 @@ app.configure('production', function(){
 app.API_PREFIX = '/api/0.1'
 require('./users')(app);
 require('./routes/main')(app);
+require('./routes/socket')(app);
 
 if (!module.parent) {
   app.listen(3000);

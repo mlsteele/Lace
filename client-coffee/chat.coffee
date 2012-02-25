@@ -1,8 +1,13 @@
+plantTimeout  = (ms, cb) -> setTimeout  cb, ms
+plantInterval = (ms, cb) -> setInterval cb, ms
+
+API_PREFIX = '/api/0.1'
+
 console.log 'hi! chat.coffee has loaded.'
 
 $ ->
   console.log 'chat.coffee is running under jquery after the dom'
-  API_PREFIX = '/api/0.1'
+  
   
   # DOM Setup
   $output = $ '.chat-log'
@@ -20,24 +25,29 @@ $ ->
     onInput? v
   
   
-  activeUser = undefined
-  
-  # login
-  login = (name) ->
+  # states
+  getName = (name) ->
     onInput = ->
-    console.log 'input callback called with', name
-    $.post API_PREFIX+'/login', {name: name}, (user) ->
-      console.log 'received user', activeUser = user
-      post 'you are ' + user.name + '\nyou were created ' + user.created
-      post 'type to chat'
-      onInput = chatting
+    console.log 'setting name to ' + name
+    socket.emit 'set name', name
+    post 'type to talk.'
+    onInput = chat
+    socket.on 'chat msg', (msgobj) ->
+      post msgobj.sender + ' says "' + msgobj.msg + '"'
   
-  # chat
-  chatting = (msg) ->
-    post 'you said: "' + msg + '"'
-    $.post API_PREFIX+'/say', {user: activeUser, msg: msg}, (status) ->
-      if status is not 'ok' then console.error 'message could not be sent'
+  chat = (msg) ->
+    socket.emit 'chat msg', {msg: msg}
   
-  # exec
-  post 'Enter your name:'
-  onInput = login
+  # Transport
+  post 'awaiting socket...'
+  
+  socket = io.connect()
+  
+  socket.on 'connect', ->
+    post 'socket connected'
+    console.log socket
+    post 'enter name.'
+    onInput = getName
+  
+  socket.on 'disconnect', ->
+    post 'socket disconnected'

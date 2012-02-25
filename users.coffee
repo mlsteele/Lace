@@ -1,23 +1,26 @@
+# This is what a user has:
+# name
+# send -- a way to send messages to them
+
 _U = require 'underscore'
 
 users = []
+usersExcept = (user) -> _U.without users, user
 
 module.exports = (app) ->
-  app.user = {
-    login: (userName) ->
-      console.log 'logging in user named "' + userName + '"'
-      user = _U.detect users, ((e) -> e.name is userName)
-      if user? then console.log 'who already exists'; return user
-      user = {
-        name: userName
-        created: new Date().toJSON()}
-      console.log 'created new user', user.name
+  app.users =
+    join: (user) ->
+      if (_U.detect users, (u) -> u.uniq is user.uniq)?
+        throw 'cannot register user who is already in users'
       users.push user
+      console.log 'added user named ' + user.name
+      console.log 'user count: ' + users.length
       user
     
-    say: (user, msg) ->
-      console.log user.name, 'said', msg
-      'ok'
-  }
-  
-  # plantInterval 2000, -> console.log 'users:', users
+    leave: (user) ->
+      u.send user.name + ' has left.' for u in (users = usersExcept user)
+      console.log 'user count: ' + users.length
+    
+    recvMsg: (user, msg) ->
+      console.log 'received message, resending to ' + (usersExcept user).length
+      u.send {sender: user.name, msg: msg} for u in usersExcept user
