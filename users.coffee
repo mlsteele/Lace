@@ -1,6 +1,8 @@
 # This is what a user has:
 # name
-# send -- a way to send messages to them
+# uniq     -- something serializable and unique to use as a basis for comparison
+# sendMsg  -- a way to send messages to them
+# sendList -- a way to send an updated user list down
 
 _U = require 'underscore'
 
@@ -15,15 +17,17 @@ module.exports = (app) ->
       users.push user
       console.log 'joined user named ' + user.name
       console.log 'user count: ' + users.length
+      u.sendList {users: users, delta: {state: 'joined', user: user}} for u in users
       user
     
     leave: (user) ->
       console.log user.name + ' has left.'
-      u.send {msg: user.name + ' has left.'} for u in (users = usersExcept user)
+      users = usersExcept user
+      u.sendList {users: users, delta: {state: 'left', user: user}} for u in users
       console.log 'user count: ' + users.length
     
     recvMsg: (user, msg) ->
       console.log 'received message from ' + user.name +
                   ', resending to ' + (usersExcept user).length
-      msg.sender = user.name
-      u.send msg for u in usersExcept user
+      msg.sender = user
+      u.sendMsg msg for u in usersExcept user
