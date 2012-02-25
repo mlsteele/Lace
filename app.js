@@ -30,6 +30,8 @@ require('./routes/main')(app);
 require('./routes/socket')(app);
 
 if (!module.parent) {
-  app.listen(3000);
+  var port = process.argv[2];
+  port = (0 <= port && port <= 65535) ? port : 3000;
+  app.listen(port);
   console.log("Express server listening on port %d", app.address().port);
 }
