@@ -26,8 +26,8 @@ module.exports = (app) ->
       u.sendList {users: users, delta: {state: 'left', user: user}} for u in users
       console.log 'user count: ' + users.length
     
-    recvMsg: (user, msg) ->
-      console.log 'received message from ' + user.name +
-                  ', resending to ' + (usersExcept user).length
-      msg.sender = user
-      u.sendMsg msg for u in usersExcept user
+    passMsg: (msg) ->
+      # console.log 'received message from ' + msg.from.name +
+      #             ', resending to ' + (usersExcept user).length
+      recipient = (_U.detect users, (u) -> msg.to.uniq is u.uniq)
+      if recipient? then recipient.sendMsg msg else throw 'tried to passage message to disappeared user'

@@ -18,7 +18,8 @@ module.exports = (app) ->
       
       socket.on 'chat msg', (msg) ->
         console.log 'chat message from socket of user named ' + user.name + ' -> ' + msg.msg
-        app.users.recvMsg user, msg
+        msg.from = user
+        app.users.passMsg msg
       
       socket.on 'disconnect', ->
         console.log 'socket disconnected of user named ' + user.name

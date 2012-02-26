@@ -11,7 +11,7 @@ $ ->
   
   # DOM Setup
   $output = $ '.chat-log'
-  $input = $ '.chat-input'
+  $input = ($ '.chat-input').focus()
   $userlist = $ '.chat-userlist'
   
   post = (msg) ->
@@ -26,12 +26,26 @@ $ ->
       post '\n-- ' + v + '\n'
       onInput? v
   
+  clearUserList = -> $userlist.children().remove()
+  
   updateUserList = (users) ->
     if !client.activeUser? then throw 'tried to updateUserList with no activeUser'
     console.log 'updating user list to', users
-    $userlist.children().remove()
-    for lu in (_.filter users, (u) -> console.log client.activeUser, u; u.uniq isnt client.activeUser.uniq)
-      $userlist.append ($ '<li>', text: lu.name + ' (' + lu.uniq + ')').data('user', lu)
+    clearUserList()
+    for lu in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
+      li = ($ '<li>', text: lu.name + ' (' + lu.uniq + ')').data('user', lu)
+      $userlist.append li
+      li.click ->
+        client.sendingTo = li.data().user
+        li.css 'background-color': '#ADF9FF'
+        console.log 'clicked on', li
+        $input.focus()
+    selectedLi = $ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq
+    if !selectedLi?.click()?
+      console.log 'nullifying client.sendingTo'
+      client.sendingTo = null
+    else
+      console.log 'selectedLi set to', selectedLi
   
   
   # transport
@@ -48,6 +62,8 @@ $ ->
     post 'socket disconnected.'
     client.sock.removeAllListeners e for e in ['chat msg', 'chat list']
     client.activeUser = null
+    client.sendingTo = null
+    clearUserList()
     onInput = null
   
   # states
@@ -64,7 +80,7 @@ $ ->
     client.sock.on 'chat msg', (msg) ->
       if !client.activeUser? then throw 'tried to process chat msg without an activeUser'
       console.log 'received message object', msg
-      post msg.sender.name + ' (' + msg.sender.uniq + ') says "' + msg.msg + '"'
+      post msg.from.name + ' (' + msg.from.uniq + ') says "' + msg.msg + '"'
     client.sock.on 'chat list', (list) ->
       if !client.activeUser? then throw 'tried to process a chat list msg without an activeUser'
       post 'user action: "' + list.delta.user.name + '" ' + list.delta.state
@@ -73,4 +89,9 @@ $ ->
   
   chat = (msg) ->
     if !client.activeUser? then throw 'tried to emit a chat msg without an activeUser'
-    client.sock.emit 'chat msg', {msg: msg}
+    if !client.sendingTo?
+      post 'Select a user from the column to send a message to'
+      return
+    client.sock.emit 'chat msg',
+      msg: msg
+      to: client.sendingTo
