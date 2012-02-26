@@ -30,4 +30,8 @@ module.exports = (app) ->
       # console.log 'received message from ' + msg.from.name +
       #             ', resending to ' + (usersExcept user).length
       recipient = (_U.detect users, (u) -> msg.to.uniq is u.uniq)
-      if recipient? then recipient.sendMsg msg else throw 'tried to passage message to disappeared user'
+      if recipient?
+        recipient.sendMsg msg
+      else
+        msg.from.sendList {users: users}
+        throw 'tried to passage message to disappeared user'

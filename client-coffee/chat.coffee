@@ -41,15 +41,12 @@ $ ->
     console.log 'updating user list to', users
     $userlist.parent().show()
     clearUserList()
+    # Create entry for all but activeUser
     for u in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
       $userlist.append ($ '<li>', text: u.name + ' (' + u.uniq + ')').data('user', u)
-    selectedLi = $ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq
-    if !selectedLi?.click()?
-      console.log 'nullifying client.sendingTo'
-      client.sendingTo = null
-    else
-      console.log 'selectedLi set to', selectedLi
-  
+    client.sendingTo = null
+    # Re-click previously clicked
+    ($ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq)?.click()
   
   # transport
   post 'awaiting socket...'
@@ -94,7 +91,7 @@ $ ->
   chat = (msg) ->
     if !client.activeUser? then throw 'tried to emit a chat msg without an activeUser'
     if !client.sendingTo?
-      post 'Select a user from the column to send a message to'
+      post 'select a recipient from the column.'
       return
     client.sock.emit 'chat msg',
       msg: msg
