@@ -15,7 +15,7 @@ $ ->
   
   post = (msg) ->
     $output.append (msg+'\n').replace /(\r\n|\n|\r)/gm, '<br>'
-    $output.prop { scrollTop: $output.prop 'scrollHeight' }
+    $output.prop scrollTop: $output.prop 'scrollHeight'
   
   onInput = null
   $input.change ->
