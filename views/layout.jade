@@ -1,6 +1,13 @@
-!!!
+!!! 5
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    -each script in scripts
+      script(type='text/javascript', src= script)
+    link(rel='stylesheet', href='/css/reset.css')
+    link(rel='stylesheet', href='/css/global.css')
+    -each sheet in stylesheets
+      link(rel='stylesheet', href= sheet)
   body!= body
+//-    -each sheet in stylesheets
+//-      script(type='text/css', href= sheet)
