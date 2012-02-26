@@ -2,8 +2,8 @@ module.exports = (app) ->
   io = (require 'socket.io').listen app
   io.set 'log level', 1
   
-  io.sockets.on 'connection', (socket) ->
-    console.log 'socket connected'
+  (io.of app.API_PREFIX + '/socks/chat').on 'connection', (socket) ->
+    console.log 'chat socket connected'
     socket.on 'set name', (name, beUser) ->
       console.log 'socket name set to', name
       user =

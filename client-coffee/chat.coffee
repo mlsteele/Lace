@@ -51,7 +51,7 @@ $ ->
   # transport
   post 'awaiting socket...'
   client.activeUser = null
-  client.sock = io.connect()
+  client.sock = io.connect(document.domain + API_PREFIX + '/socks/chat')
   
   client.sock.on 'connect', ->
     post 'socket connected.'
