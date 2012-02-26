@@ -12,7 +12,6 @@ $ ->
   # DOM Setup
   $output = $ '.chat-log'
   $input = ($ '.chat-input').focus()
-  $userlist = $ '.chat-userlist'
   
   post = (msg) ->
     $output.append (msg+'\n').replace /(\r\n|\n|\r)/gm, '<br>'
@@ -26,20 +25,24 @@ $ ->
       post '\n-- ' + v + '\n'
       onInput? v
   
+  $userlist = $ '.chat-userlist'
+  $userlist.parent().hide()
+  $userlist.on 'click', 'li', ->
+    if !client.activeUser? then throw 'tried to click on other user with no activeUser'
+    client.sendingTo = $(this).data().user
+    $(this).siblings().removeAttr 'style'
+    $(this).css 'background-color': '#ADF9FF'
+    $input.focus()
+  
   clearUserList = -> $userlist.children().remove()
   
   updateUserList = (users) ->
     if !client.activeUser? then throw 'tried to updateUserList with no activeUser'
     console.log 'updating user list to', users
+    $userlist.parent().show()
     clearUserList()
-    for lu in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
-      li = ($ '<li>', text: lu.name + ' (' + lu.uniq + ')').data('user', lu)
-      $userlist.append li
-      li.click ->
-        client.sendingTo = li.data().user
-        li.css 'background-color': '#ADF9FF'
-        console.log 'clicked on', li
-        $input.focus()
+    for u in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
+      $userlist.append ($ '<li>', text: u.name + ' (' + u.uniq + ')').data('user', u)
     selectedLi = $ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq
     if !selectedLi?.click()?
       console.log 'nullifying client.sendingTo'
@@ -64,6 +67,7 @@ $ ->
     client.activeUser = null
     client.sendingTo = null
     clearUserList()
+    $userlist.parent().hide()
     onInput = null
   
   # states
