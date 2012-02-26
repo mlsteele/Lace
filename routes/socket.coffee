@@ -24,3 +24,11 @@ module.exports = (app) ->
       socket.on 'disconnect', ->
         console.log 'socket disconnected of user named ' + user.name
         app.users.leave user
+  
+  (io.of app.API_PREFIX + '/socks/observe').on 'connection', (socket) ->
+    console.log 'observer socket connected'
+    
+    app.observers.join sendMsg: (msg) -> socket.emit 'msg', msg
+    
+    socket.on 'disconnect', ->
+      console.log 'observer socket disconnected'

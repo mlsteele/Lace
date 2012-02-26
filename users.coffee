@@ -8,6 +8,7 @@ _U = require 'underscore'
 
 users = []
 usersExcept = (user) -> _U.without users, user
+observers = []
 
 module.exports = (app) ->
   app.users =
@@ -32,6 +33,13 @@ module.exports = (app) ->
       recipient = (_U.detect users, (u) -> msg.to.uniq is u.uniq)
       if recipient?
         recipient.sendMsg msg
+        o.sendMsg msg for o in observers
       else
         msg.from.sendList {users: users}
         throw 'tried to passage message to disappeared user'
+  
+  app.observers =
+    join: (o) ->
+      observers.push o
+    leave: (o) ->
+      observers = _.without observers, o
