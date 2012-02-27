@@ -48,7 +48,12 @@ $ ->
     clearUserList()
     # Create entry for all but activeUser
     for u in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
-      $userlist.append ($ '<li>', text: u.name + ' (' + u.uniq + ')').data('user', u)
+      compactUniq = (uniq, it=1) ->
+        if it is 0
+          _.reduce u.uniq.split(''), ((a,b) -> a+parseInt(b)), 0
+        else
+          compactUniq uniq, it-1
+      $userlist.append ($ '<li>', text: u.name + ' (' + (compactUniq u.uniq) + ')').data('user', u)
     client.sendingTo = null
     # Re-click previously clicked
     ($ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq)?.click()
