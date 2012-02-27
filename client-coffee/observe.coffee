@@ -92,17 +92,16 @@ $ ->
   class Bind
     constructor: ({@from, @to}) ->
       #console.log 'creatd bind from', @from, 'to', @to
-      @lifetime = 100
+      @lifetime = 200
       @age = 0
       binds.push this
     
     update: ->
       ++@age
-      if @age < 3
-        diff = @to.pos.sub @from.pos
-        attract = diff.norm().mul 1.5
-        @from.vel.plusEq attract
-        @to.vel.subEq  attract
+      diff = @to.pos.sub @from.pos
+      attract = diff.norm().mul 1/@age
+      @from.vel.plusEq attract
+      @to.vel.subEq  attract
     
     render: ->
       fastFade = 1 - Math.pow @age/@lifetime, 0.5
@@ -112,7 +111,7 @@ $ ->
           diff = @to.pos.sub @from.pos
           p = @from.pos.plus diff.mul t
           draw.CIRCLE p.x, p.y, 5, 15, '#8080EB'
-      drawMsg @age/20
+      drawMsg @age/30
   
   processMsg = (msg) ->
     safeUseUser = (user) ->
