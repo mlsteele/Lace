@@ -72,10 +72,13 @@ $ ->
       for u in _.without users, this
         diff = (@pos.sub u.pos)
         dist = diff.length()
-        @vel.plusEq diff.norm().mul 1/80 * Math.cos Math.min dist * Math.PI/2 / ((200)), Math.PI/2
+        pow = (x, p) -> if x >= 0 then Math.pow x, p else -Math.pow -x, p
+        f = (x) -> 0.5 - (pow (2*x-1), 1/3)/2
+        factor = 1/30 * f (Math.min (Math.max 0, dist/200), 1)
+        @vel.plusEq diff.norm().mul factor
       
       @pos.plusEq @vel
-      @vel.mulEq 0.8
+      @vel.mulEq 0.95
       
       # Stay in circle
       fromCenter = (@pos.sub center).length()
@@ -133,5 +136,5 @@ $ ->
     draw.resize()
     (b.update(); b.render()) for b in getBinds()
     (u.update(); u.render()) for u in users
-    plantTimeout 15, frameLoop
+    requestAnimFrame frameLoop
   )()

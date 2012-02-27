@@ -3,15 +3,18 @@ plantInterval = (ms, cb) -> setInterval cb, ms
 
 API_PREFIX = '/api/0.1'
 
-console.log 'hi! chat.coffee has loaded.'
+#console.log 'hi! chat.coffee has loaded.'
 
 $ ->
-  console.log 'chat.coffee is running under jquery after the dom'
+  #console.log 'chat.coffee is running under jquery after the dom'
   client = {}
   
   # DOM Setup
   $output = $ '.chat-log'
   $input = ($ '.chat-input').focus()
+  ($ '.crazy-toggle').on 'click', ->
+    $(this).data 'isCrazy', !$(this).data 'isCrazy'
+    if $(this).data 'isCrazy' then window.Lace.crazyClient.start() else window.Lace.crazyClient.stop()
   
   post = (msg) ->
     $output.append (msg+'\n').replace /(\r\n|\n|\r)/gm, '<br>'
@@ -38,7 +41,7 @@ $ ->
   
   updateUserList = (users) ->
     if !client.activeUser? then throw 'tried to updateUserList with no activeUser'
-    console.log 'updating user list to', users
+    #console.log 'updating user list to', users
     $userlist.parent().show()
     clearUserList()
     # Create entry for all but activeUser
@@ -75,12 +78,12 @@ $ ->
   beUser = (user) ->
     if !user? then throw 'server answer set name request with no user'
     client.activeUser = user
-    console.log 'name set to ' + user.name
+    #console.log 'name set to ' + user.name
     post 'you are ' + user.name + '.'
     post 'type to talk.'
     client.sock.on 'chat msg', (msg) ->
       if !client.activeUser? then throw 'tried to process chat msg without an activeUser'
-      console.log 'received message object', msg
+      #console.log 'received message object', msg
       post msg.from.name + ' (' + msg.from.uniq + ') says "' + msg.msg + '"'
     client.sock.on 'chat list', (list) ->
       if !client.activeUser? then throw 'tried to process a chat list msg without an activeUser'

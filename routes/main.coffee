@@ -16,5 +16,6 @@ module.exports = (app) ->
     res.render 'observe',
       title: 'Lace | Observe'
       scripts: ['/socket.io/socket.io.js', '/vendor/jquery-1.7.1.min.js',
-                '/vendor/underscore-min.js', '/js/v2d.js', '/js/observe.js']
+                '/vendor/underscore-min.js', '/vendor/requestAnimFrame.js',
+                '/js/v2d.js', '/js/observe.js']
       stylesheets: ['/css/observe.css']
