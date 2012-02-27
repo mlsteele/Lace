@@ -52,6 +52,8 @@ $ ->
   # Viz
   
   [width, height] = [canvas.width, canvas.height]
+  mainRad = (Math.min width, height) / 2 - 30
+  center = (new V2D width, height).mulEq 1/2
   
   users = []
   binds = [] # careful, binds handle this themselves
@@ -65,8 +67,21 @@ $ ->
       @vel = new V2D 0, 0
     
     update: ->
+      #@vel.plusEq (@pos.sub center).norm().mul 1/20
+      # repel each other
+      for u in _.without users, this
+        diff = (@pos.sub u.pos)
+        dist = diff.length()
+        @vel.plusEq diff.norm().mul 1/80 * Math.cos Math.min dist * Math.PI/2 / ((200)), Math.PI/2
+      
       @pos.plusEq @vel
-      @vel.mulEq 0.95
+      @vel.mulEq 0.8
+      
+      # Stay in circle
+      fromCenter = (@pos.sub center).length()
+      if fromCenter > mainRad
+        @pos.plusEq (center.sub @pos).norm().mul fromCenter - mainRad
+        #draw.CIRCLE 50, 50, 20, 0, '#f00'
     
     render: ->
       draw.CIRCLE @pos.x, @pos.y, 10, 15, '#B8D3EE'
@@ -82,13 +97,13 @@ $ ->
       ++@age
       if @age < 3
         diff = @to.pos.sub @from.pos
-        attract = diff.norm().mul 1
+        attract = diff.norm().mul 1.5
         @from.vel.plusEq attract
         @to.vel.subEq  attract
     
     render: ->
       fastFade = 1 - Math.pow @age/@lifetime, 0.5
-      draw.LINE @from.pos, @to.pos, 10 * (fastFade), 'rgba(100, 100, 255, ' + fastFade*0.1 + ')'
+      draw.LINE @from.pos, @to.pos, 10 * (fastFade), 'rgba(100, 100, 255, ' + fastFade*0.4 + ')'
       drawMsg = (t) =>
         if 0 <= t <= 1
           diff = @to.pos.sub @from.pos
