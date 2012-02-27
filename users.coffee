@@ -36,7 +36,7 @@ module.exports = (app) ->
         o.sendMsg msg for o in observers
       else
         msg.from.sendList {users: users}
-        throw 'tried to passage message to disappeared user'
+        console.log 'WARN: tried to passage message to disappeared user'
   
   app.observers =
     join: (o) ->
