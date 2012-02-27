@@ -10,11 +10,13 @@ $ ->
   client = {}
   
   # DOM Setup
-  $output = $ '.chat-log'
+  $output = ($ '.chat-log').on 'click', -> $input.focus()
   $input = ($ '.chat-input').focus()
   ($ '.crazy-toggle').on 'click', ->
     $(this).data 'isCrazy', !$(this).data 'isCrazy'
     if $(this).data 'isCrazy' then window.Lace.crazyClient.start() else window.Lace.crazyClient.stop()
+    post 'isCrazy: ' + $(this).data 'isCrazy'
+    $input.focus()
   
   post = (msg) ->
     $output.append (msg+'\n').replace /(\r\n|\n|\r)/gm, '<br>'
