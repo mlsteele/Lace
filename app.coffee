@@ -28,4 +28,4 @@ if !module.parent
   port = if 0 <= process.argv[2] <= 65535 then process.argv[2] else 3000
   #host = if process.argv[3]?.length then process.argv[3] else '0.0.0.0'
   app.listen port
-  console.log 'Express server listening on port ' + app.address().port
+  console.log "Express server listening on port #{app.address().port} in #{process.env.NODE_ENV} mode"
