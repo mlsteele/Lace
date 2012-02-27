@@ -68,15 +68,15 @@ $ ->
   getBinds = -> binds = _.reject binds, (b) -> b.age > b.lifetime
   
   class UserBlob
-    constructor: (user) ->
-      @name = user.name
-      @uniq = user.uniq
+    constructor: ({@name, @uniq}) ->
       @pos = new V2D Math.random() * mainRad, Math.random() * mainRad
       @vel = new V2D 0, 0
       @rad = 15
+      @sinceMsg = 0
     
     update: ->
-      #@vel.plusEq (@pos.sub center).norm().mul 1/20
+      @sinceMsg++
+      
       for u in _.without users, this
         # repel
         diff = (@pos.sub u.pos)
@@ -102,7 +102,7 @@ $ ->
     
     render: ->
       draw.CIRCLE @pos.x, @pos.y, @rad, 15, '#B8D3EE'
-      draw.TEXT @pos.x, @pos.y, @name.slice(0, 10), '#496A8B'
+      draw.TEXT @pos.x, @pos.y, @name.slice(0, 10), "rgba(76, 109, 141, #{1/(@sinceMsg/50)})"
   
   class Bind
     constructor: ({@from, @to, @msg}) ->
@@ -110,9 +110,10 @@ $ ->
       @lifetime = 200
       @age = 0
       binds.push this
+      u.sinceMsg = 0 for u in [@from, @to]
     
     update: ->
-      ++@age
+      @age++
       diff = @to.pos.sub @from.pos
       attract = diff.norm().mul 1/@age
       @from.vel.plusEq attract
