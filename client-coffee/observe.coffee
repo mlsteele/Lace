@@ -69,7 +69,7 @@ $ ->
       @vel.mulEq 0.95
     
     render: ->
-      draw.CIRCLE @pos.x, @pos.y, 10, 50, '#B8D3EE'
+      draw.CIRCLE @pos.x, @pos.y, 10, 15, '#B8D3EE'
   
   class Bind
     constructor: ({@from, @to}) ->
@@ -82,14 +82,19 @@ $ ->
       ++@age
       if @age < 3
         diff = @to.pos.sub @from.pos
-        attract = (diff.div diff.length() + 1).mul 1
+        attract = diff.norm().mul 1
         @from.vel.plusEq attract
         @to.vel.subEq  attract
     
     render: ->
-      alpha = 1-(@age/@lifetime)
-      draw.LINE @from.pos, @to.pos, 10 * (1 - Math.pow @age/@lifetime, 0.5), 'rgba(255, 100, 100, '+alpha+')'
-      draw.CIRCLE 
+      fastFade = 1 - Math.pow @age/@lifetime, 0.5
+      draw.LINE @from.pos, @to.pos, 10 * (fastFade), 'rgba(100, 100, 255, ' + fastFade*0.1 + ')'
+      drawMsg = (t) =>
+        if 0 <= t <= 1
+          diff = @to.pos.sub @from.pos
+          p = @from.pos.plus diff.mul t
+          draw.CIRCLE p.x, p.y, 5, 15, '#8080EB'
+      drawMsg @age/20
   
   processMsg = (msg) ->
     safeUseUser = (user) ->
