@@ -12,10 +12,10 @@ $ ->
   # DOM
   $output = ($ '.chat-log').on 'click', -> $input.focus()
   $input = ($ '.chat-input').focus()
-  ($ '.crazy-toggle').on 'click', ->
-    $(this).data 'isCrazy', !$(this).data 'isCrazy'
-    if $(this).data 'isCrazy' then window.Lace.crazyClient.start() else window.Lace.crazyClient.stop()
-    $(this).css 'background-color': if ($(this).data 'isCrazy') then '#FFC7AD' else 'transparent'
+  ($ '.dummy-toggle').on 'click', ->
+    $(this).data 'isDummy', !$(this).data 'isDummy'
+    if $(this).data 'isDummy' then window.Lace.dummyClient.start() else window.Lace.dummyClient.stop()
+    $(this).css 'background-color': if ($(this).data 'isDummy') then '#FFC7AD' else 'transparent'
     $input.focus()
   
   post = (msg) ->
@@ -107,15 +107,15 @@ $ ->
       to: client.sendingTo
   
   
-  # Crazy Client
+  # Dummy Client
   window.Lace = window.Lace || {}
-  window.Lace.crazyClient =
+  window.Lace.dummyClient =
     start: ->
-      crazyClientLoop = ->
+      dummyClientLoop = ->
         if $userlist.parent().is ':visible'
           ($userlist.children().sort -> Math.round(Math.random()) - 0.5).slice(0,1).click()
-          $input.val('crrrrrazyClient message!').change()
-        tid = plantTimeout 300 + Math.random()*3e3, crazyClientLoop
-        window.Lace.crazyClient.stop = -> clearTimeout tid
-      crazyClientLoop()
+          $input.val('dummy client message').change()
+        tid = plantTimeout 300 + Math.random()*3e3, dummyClientLoop
+        window.Lace.dummyClient.stop = -> clearTimeout tid
+      dummyClientLoop()
     stop: ->
