@@ -27,7 +27,7 @@ $ ->
     v = $input.val()
     $input.val ''
     if onInput?
-      post '\n-- ' + v + '\n'
+      post "\n-- #{v}\n"
       onInput? v
   
   $userlist = $ '.chat-userlist'
@@ -48,11 +48,10 @@ $ ->
     clearUserList()
     # Create entry for all but activeUser
     for u in (_.filter users, (u) -> u.uniq isnt client.activeUser.uniq)
-      $userlist.append ($ '<li>', text: u.name + ' (' + (compactUniq u.uniq) + ')').data('user', u)
+      $userlist.append ($ '<li>', text: "#{u.name} (#{compactUniq u.uniq})").data('user', u)
     client.sendingTo = null
     # Re-click previously clicked
     ($ _.detect $userlist.children(), (li) -> $(li).data().user.uniq is client.sendingTo?.uniq)?.click()
-  
   
   compactUniq = (uniq) ->
     _.reduce uniq.split(''), ((a,b) -> a+parseInt(b)), 0
@@ -84,17 +83,17 @@ $ ->
   beUser = (user) ->
     if !user? then throw 'server answer set name request with no user'
     client.activeUser = user
-    #console.log 'name set to ' + user.name
-    post 'you are ' + user.name + '.'
+    #console.log "name set to #{user.name}"
+    post "your name is now #{user.name}."
     post 'type to talk.'
     client.sock.on 'chat msg', (msg) ->
       if !client.activeUser? then throw 'tried to process chat msg without an activeUser'
       #console.log 'received message object', msg
-      post msg.from.name + ' (' + (compactUniq msg.from.uniq) + ') says "' + msg.msg + '"'
+      post "#{msg.from.name} (#{compactUniq msg.from.uniq}) says \"#{msg.msg}\""
     client.sock.on 'chat list', (list) ->
       if !client.activeUser? then throw 'tried to process a chat list msg without an activeUser'
       if list.delta?
-        post 'user action: "' + list.delta.user.name + '" ' + list.delta.state
+        post "user action: \"#{list.delta.user.name}\" #{list.delta.state}"
       updateUserList list.users
     onInput = chat
   
