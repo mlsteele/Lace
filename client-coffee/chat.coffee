@@ -96,3 +96,17 @@ $ ->
     client.sock.emit 'chat msg',
       msg: msg
       to: client.sendingTo
+  
+  
+  # Crazy Client
+  window.Lace = window.Lace || {}
+  window.Lace.crazyClient =
+    start: ->
+      crazyClientLoop = ->
+        if $userlist.parent().is ':visible'
+          ($userlist.children().sort -> Math.round(Math.random()) - 0.5).slice(0,1).click()
+          $input.val('crrrrrazyClient message!').change()
+        tid = plantTimeout 300 + Math.random()*3e3, crazyClientLoop
+        window.Lace.crazyClient.stop = -> clearTimeout tid
+      crazyClientLoop()
+    stop: ->

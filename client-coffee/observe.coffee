@@ -11,7 +11,7 @@ $ ->
   client.sock.on 'connect', -> console.log 'socket connected'
   client.sock.on 'disconnect', -> console.log 'socket disconnected'
   client.sock.on 'msg', (msg) ->
-    console.log 'received message', msg
+    #console.log 'received message', msg
     processMsg msg
   
   
@@ -27,7 +27,7 @@ $ ->
   V2D = window.Lace.V2D
   draw = {ctx: ctx, canvas: canvas}
   
-  draw.resize = ->
+  draw.resize = (color) ->
     canvas.width = $canvas.width()
     canvas.height = $canvas.height()
   
@@ -43,6 +43,7 @@ $ ->
   draw.LINE = (a, b, width=3, color='#555') ->
     ctx.lineWidth = width
     ctx.strokeStyle = color
+    ctx.lineCap = 'round'
     ctx.beginPath()
     ctx.moveTo a.x, a.y
     ctx.lineTo b.x, b.y
@@ -68,11 +69,11 @@ $ ->
       @vel.mulEq 0.95
     
     render: ->
-      draw.CIRCLE @pos.x, @pos.y, 10, 10, '#B8D3EE'
+      draw.CIRCLE @pos.x, @pos.y, 10, 50, '#B8D3EE'
   
   class Bind
     constructor: ({@from, @to}) ->
-      console.log 'creatd bind from', @from, 'to', @to
+      #console.log 'creatd bind from', @from, 'to', @to
       @lifetime = 100
       @age = 0
       binds.push this
@@ -87,7 +88,8 @@ $ ->
     
     render: ->
       alpha = 1-(@age/@lifetime)
-      draw.LINE @from.pos, @to.pos, 3, 'rgba(255, 8, 0, '+alpha+')'
+      draw.LINE @from.pos, @to.pos, 10 * (1 - Math.pow @age/@lifetime, 0.5), 'rgba(255, 100, 100, '+alpha+')'
+      draw.CIRCLE 
   
   processMsg = (msg) ->
     safeUseUser = (user) ->
@@ -100,11 +102,11 @@ $ ->
   
   initUser = (user) ->
     u = new UserBlob user
-    console.log 'users is now of length', users.push u
+    users.push u
     u
   
   vizMsg = (msg) ->
-    console.log 'visualizing message from', msg.from, 'to', msg.to, 'of length', msg.msg.length
+    #console.log 'visualizing message from', msg.from, 'to', msg.to, 'of length', msg.msg.length
     new Bind msg
   
   (frameLoop = ->
