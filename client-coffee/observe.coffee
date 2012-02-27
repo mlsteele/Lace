@@ -49,6 +49,14 @@ $ ->
     ctx.lineTo b.x, b.y
     ctx.stroke()
   
+  draw.TEXT = (x, y, str='', color='#555') ->
+    ctx.font = '14px "Lucida Grande", Helvetica, Arial, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = color
+    ctx.fillText(str, x, y);
+  
+  
   # Viz
   
   [width, height] = [canvas.width, canvas.height]
@@ -63,19 +71,25 @@ $ ->
     constructor: (user) ->
       @name = user.name
       @uniq = user.uniq
-      @pos = new V2D Math.random() * width, Math.random() * height
+      @pos = new V2D Math.random() * mainRad, Math.random() * mainRad
       @vel = new V2D 0, 0
+      @rad = 15
     
     update: ->
       #@vel.plusEq (@pos.sub center).norm().mul 1/20
-      # repel each other
       for u in _.without users, this
+        # repel
         diff = (@pos.sub u.pos)
         dist = diff.length()
         pow = (x, p) -> if x >= 0 then Math.pow x, p else -Math.pow -x, p
         f = (x) -> 0.5 - (pow (2*x-1), 1/3)/2
         factor = 1/30 * f (Math.min (Math.max 0, dist/200), 1)
         @vel.plusEq diff.norm().mul factor
+        
+        # collide
+        if dist/2 < @rad + 15
+          @pos.plusEq diff.norm().mul (@rad + 15 - dist / 2)
+          u.pos.subEq diff.norm().mul (@rad + 15 - dist / 2)
       
       @pos.plusEq @vel
       @vel.mulEq 0.95
@@ -87,10 +101,11 @@ $ ->
         #draw.CIRCLE 50, 50, 20, 0, '#f00'
     
     render: ->
-      draw.CIRCLE @pos.x, @pos.y, 10, 15, '#B8D3EE'
+      draw.CIRCLE @pos.x, @pos.y, @rad, 15, '#B8D3EE'
+      draw.TEXT @pos.x, @pos.y, @name.slice(0, 10), '#496A8B'
   
   class Bind
-    constructor: ({@from, @to}) ->
+    constructor: ({@from, @to, @msg}) ->
       #console.log 'creatd bind from', @from, 'to', @to
       @lifetime = 200
       @age = 0
@@ -110,7 +125,8 @@ $ ->
         if 0 <= t <= 1
           diff = @to.pos.sub @from.pos
           p = @from.pos.plus diff.mul t
-          draw.CIRCLE p.x, p.y, 5, 15, '#8080EB'
+          rad = Math.min @msg.length / 10 + 2, 20
+          draw.CIRCLE p.x, p.y, rad, 15, '#8080EB'
       drawMsg @age/30
   
   processMsg = (msg) ->
