@@ -11,7 +11,6 @@ $ ->
   client.sock.on 'connect', -> console.log 'socket connected'
   client.sock.on 'disconnect', -> console.log 'socket disconnected'
   client.sock.on 'msg', (msg) ->
-    #console.log 'received message', msg
     processMsg msg
   
   
@@ -115,7 +114,8 @@ $ ->
     update: ->
       @age++
       diff = @to.pos.sub @from.pos
-      attract = diff.norm().mul 1/@age
+      pullFactor = Math.min @msg.length / 50 + 0.1, 1.3
+      attract = diff.norm().mul pullFactor/@age
       @from.vel.plusEq attract
       @to.vel.subEq  attract
     
